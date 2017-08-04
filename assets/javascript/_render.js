@@ -2,28 +2,36 @@ const render = {};
 
 
 
-// Render array into list
-render.list = (parentId, list, el = 'div', escapeHTML = true) => {
-  let html = '';
-  let item;
-  for (var i = 0; i < list.length; i++) {
-    item = list[i];
-    if (escapeHTML !== false) item = e(item);
+render.watch = () => {
+  render.handlebars();
 
-    html += `
-    <${el}>
-      ${item}
-    </${el}>`;
-  }
+  render.all();
 
-  document.getElementById(parentId).innerHTML = html;
-
-  if (typeof parentId === 'undefined') console.log('renderList() params... id of list parent element, list array, element type (optional - default is div)');
+  watch(app, function(){
+    render.all();
+  });
 }
 
 
 
-// Render Everything
+// Replace {var} with string
+render.handlebars = () => {
+  let html = document.getElementById('app').innerHTML;
+
+  let occurs = html.replace(/[^{]/g, "").length; // number of times { occurs
+  for (var i = 0; i < occurs; i++) {
+      var string = getBrackets(
+        html, '{', '}'
+      );
+      html = html.replace(`{${string}}`, app[string]);
+  }
+
+  document.getElementById('app').innerHTML = html;
+}
+
+
+
+// Render Everything (needs refactor)
 render.all = () => {
   // get all elements with data-v attribute
   var elements = document.querySelectorAll('[data-v]');
@@ -60,21 +68,15 @@ render.all = () => {
         runFunction(el, data, params);
         break;
       default:
-        console.log(`Unhandled type while attempting render.all()`);
+        console.log(`render.all() type error`);
     }
   }
 }
 
 
 
-const handleParams = (data, params) => {
-  if (params.indexOf('raw') >= 0) return data;
-}
-
-
-
+// Return String Between Characters (eg () or {} )
 const getBrackets = (string, start, end) => {
-
   start = string.indexOf(start) + start.length;
   end = string.indexOf(end);
 
@@ -85,54 +87,48 @@ const getBrackets = (string, start, end) => {
 
 
 
+// Render Array Into List
+render.list = (parentId, list, el = 'div', escapeHTML = true) => {
+  let html = '';
+  let item;
+
+  for (var i = 0; i < list.length; i++) {
+    item = list[i];
+    if (escapeHTML !== false) item = e(item);
+
+    html += `
+    <${el}>
+      ${item}
+    </${el}>`;
+  }
+
+  document.getElementById(parentId).innerHTML = html;
+
+  if (typeof parentId === 'undefined') console.log('renderList() Requies: parentId, list array. Optional: el type, escapeHTML');
+}
+
+
+
+// Handle function passed in attribute
 const runFunction = (el, data, params) => {
   let brackets;
 
-  if (params.indexOf('(') >= 0) {
-    // if function has () get string inside
-    brackets = getBrackets(params, '(', ')');
-  }
+  // if function has () get string inside
+  if (params.indexOf('(') >= 0) brackets = getBrackets(params, '(', ')');
 
   // if eval, save as js
   if (params.indexOf('eval') >= 0) brackets = eval(brackets);
 
-  if (typeof(data(brackets) === 'string')) {
-    // if returns string, update HTML. else run as function
-    params.indexOf('raw') >= 0 ? el.innerHTML = data(brackets) : el.innerHTML = e(data(brackets));
-  } else {
-    data(brackets);
-  }
+  // if not raw then escape html
+  if (params.indexOf('raw') >= 0) brackets = e(brackets);
+
+  // if returns string, update HTML. else run as function
+  typeof(data(brackets) === 'string') ? el.innerHTML = data(brackets) : data(brackets);
 }
 
 
 
-
-
-
-
-// seperate function, can be called before or after or not at all
-render.handlebars = () => {
-  let html = document.getElementById('app').innerHTML;
-
-  let occurs = html.replace(/[^{]/g, "").length; // number of times { occurs
-  for (var i = 0; i < occurs; i++) {
-      var string = getBrackets(
-        html, '{', '}'
-      );
-      html = html.replace(`{${string}}`, app[string]);
-  }
-
-  document.getElementById('app').innerHTML = html;
-}
-
-
-
-render.watch = () => {
-  render.handlebars();
-
-  render.all();
-
-  watch(app, function(){
-    render.all();
-  });
+// may be depreciated
+const handleParams = (data, params) => {
+  if (params.indexOf('raw') >= 0) return data;
 }

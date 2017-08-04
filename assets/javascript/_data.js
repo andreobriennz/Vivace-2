@@ -1,10 +1,10 @@
-// Get Input
 const data = {};
 
 
 
+// Get Input
 data.getInput = (id, clear = false, name) => {
-  let input = $('#addItem').val();
+  let input = document.getElementById('addItem').value;
 
   // save if name defined, else return
   if (typeof name !== 'undefined') {
@@ -22,7 +22,7 @@ data.getInput = (id, clear = false, name) => {
 
 // Get Attribute
 data.getAttribute = (id, attribute, name) => {
-  let value = $(`#${id}`).attr(attribute);
+  let value = document.getElementById(id).getAttribute(attribute)
 
   if (typeof name !== 'undefined') {
     data.attribute[name] = value;

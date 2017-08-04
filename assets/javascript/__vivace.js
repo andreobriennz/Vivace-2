@@ -1,4 +1,4 @@
-// Vivace 2.0.0 pre-alpha - Updated 3 Aug 2017
+// Vivace 2.0.0 pre-alpha - Updated 5 Aug 2017
 const vivace = {};
 
 

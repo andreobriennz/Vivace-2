@@ -1,4 +1,7 @@
 // AJAX (without jQuery)
+
+// NOTE: currently in early stages of development
+
 const ajax = {};
 
 

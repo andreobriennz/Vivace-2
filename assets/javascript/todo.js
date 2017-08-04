@@ -3,13 +3,11 @@ window.onload = render.watch;
 var app = {
   title: "Welcome",
   todo: [],
-  speak: function (words) {
-    // console.log(words);
-    return words;
+  // example function. returns what is passed to it
+  speak: function (string) {
+    return string;
   }
 }
-
-var var1 = 'teeest';
 
 
 
